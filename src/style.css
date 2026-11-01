@@ -1,0 +1,220 @@
+/* ---------- Animatable colour variables ----------
+   Normally CSS can't smoothly animate a custom property. Registering them
+   with @property tells the browser they are colours, so `transition` works.
+   That is what makes the chatbot colours fade when you change job. */
+@property --accent  { syntax: '<color>'; inherits: true; initial-value: #22d3ee; }
+@property --accent2 { syntax: '<color>'; inherits: true; initial-value: #3b82f6; }
+
+:root {
+  --accent: #22d3ee;   /* set from JavaScript per job */
+  --accent2: #3b82f6;
+  --text: #e8f0ff;
+  --muted: #9db0d6;
+  transition: --accent 0.6s ease, --accent2 0.6s ease;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  /* Layer 1-2: the grid lines. Layer 3-4: neon glow blobs. Layer 5: deep blue base. */
+  background:
+    linear-gradient(rgba(80, 140, 255, 0.12) 1px, transparent 1px) 0 0 / 44px 44px,
+    linear-gradient(90deg, rgba(80, 140, 255, 0.12) 1px, transparent 1px) 0 0 / 44px 44px,
+    radial-gradient(circle at 15% 10%, rgba(0, 255, 213, 0.28), transparent 45%),
+    radial-gradient(circle at 85% 90%, rgba(168, 85, 247, 0.30), transparent 50%),
+    linear-gradient(160deg, #04102e 0%, #0a2a7a 55%, #0b1b5c 100%);
+  background-attachment: fixed;
+}
+
+.app {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 20px 16px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- Header ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 10px;
+  box-shadow: 0 8px 20px -14px var(--accent);
+}
+.header h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  letter-spacing: 0.04em;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.link-btn:hover { color: var(--text); }
+
+/* ---------- Job bubbles ---------- */
+.jobs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.job {
+  --job-accent: var(--accent);
+  padding: 10px 20px;
+  border-radius: 999px;            /* fully round, like the circles in the sketch */
+  border: 2px solid var(--job-accent);
+  background: rgba(5, 15, 50, 0.55);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+}
+.job:hover { transform: translateY(-2px); }
+.job.active {
+  background: var(--job-accent);
+  color: #04102e;
+  box-shadow: 0 0 18px var(--job-accent);
+}
+
+/* ---------- Chat panel ---------- */
+.chat {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--accent);
+  background: rgba(4, 12, 40, 0.62);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 30px -8px var(--accent), inset 0 0 40px -30px var(--accent2);
+}
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+}
+
+.msg {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+/* Bot on the LEFT, user on the RIGHT - as in the sketch */
+.msg.bot {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-top-left-radius: 4px;
+}
+.msg.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #04102e;
+  font-weight: 500;
+  border-top-right-radius: 4px;
+}
+.msg code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.msg.typing { opacity: 0.7; font-style: italic; }
+.msg.error-msg { border-color: #ff6b81; color: #ffb3c0; }
+
+/* ---------- Suggestion chips ---------- */
+.starters { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+.starters:empty { display: none; }
+.chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.chip:hover { background: color-mix(in srgb, var(--accent) 25%, transparent); }
+
+/* ---------- Composer ---------- */
+.composer { display: flex; gap: 10px; margin-top: 12px; }
+input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+button[type='submit'] {
+  padding: 0 22px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #04102e;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+button[type='submit']:disabled { opacity: 0.5; cursor: wait; }
+
+/* ---------- API key modal ---------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(2, 6, 25, 0.8);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+.modal[hidden] { display: none; }
+.modal-card {
+  width: min(440px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid var(--accent);
+  background: #07123a;
+  box-shadow: 0 0 40px -6px var(--accent);
+}
+.modal-card h2 { margin: 0; }
+.modal-card p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+.modal-card a { color: var(--accent); }
+.modal-card button[type='submit'] { padding: 12px; }
+.error { color: #ff8da1 !important; }
+[hidden] { display: none !important; }
+
+@media (max-width: 520px) {
+  .msg { max-width: 92%; }
+}
