@@ -7,24 +7,44 @@
   </head>
   <body data-persona="pm">
     <div class="app">
-      <!-- Title bar (top of the sketch) -->
+      <!-- Slim title bar -->
       <header class="header">
         <h1>AI Interview Agent</h1>
         <button id="change-key" class="link-btn" type="button" hidden>Change API key</button>
       </header>
 
-      <!-- The three job "bubbles" (Job1 / Job2 / Job3 in the sketch) -->
-      <nav id="jobs" class="jobs" aria-label="Choose the job you are interviewing for"></nav>
+      <div class="layout">
+        <!-- Role picker: a sidebar on desktop, a scrolling row on phones -->
+        <nav id="jobs" class="jobs" aria-label="Choose the job you are interviewing for"></nav>
 
-      <!-- Chat panel: bot messages on the left, user messages on the right -->
-      <main class="chat">
-        <div id="messages" class="messages" aria-live="polite"></div>
-        <div id="starters" class="starters"></div>
-        <form id="chat-form" class="composer" autocomplete="off">
-          <input id="chat-input" type="text" placeholder="Type your answer or a question..." required />
-          <button id="send-btn" type="submit">Send</button>
-        </form>
-      </main>
+        <section class="panel">
+          <!-- Top bar of the panel: current role, Chat/Quiz switch, clear button -->
+          <div class="panel-top">
+            <div id="role-title" class="role-title"></div>
+            <div class="mode-tabs" role="tablist">
+              <button id="tab-chat" class="mode active" type="button" role="tab" data-mode="chat">Chat</button>
+              <button id="tab-quiz" class="mode" type="button" role="tab" data-mode="quiz">Quiz</button>
+            </div>
+            <button id="clear-chat" class="link-btn" type="button">Clear chat</button>
+          </div>
+
+          <!-- CHAT view -->
+          <div id="chat-view" class="view">
+            <div class="messages-wrap">
+              <div id="messages" class="messages" aria-live="polite"></div>
+              <button id="jump-btn" class="jump" type="button" hidden>↓ Latest</button>
+            </div>
+            <div id="starters" class="starters"></div>
+            <form id="chat-form" class="composer" autocomplete="off">
+              <input id="chat-input" type="text" placeholder="Type your answer or a question..." required />
+              <button id="send-btn" type="submit">Send</button>
+            </form>
+          </div>
+
+          <!-- QUIZ view (filled in by main.js) -->
+          <div id="quiz-view" class="view quiz" hidden></div>
+        </section>
+      </div>
     </div>
 
     <!-- API key screen: shown until the user enters a key -->

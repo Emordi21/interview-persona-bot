@@ -10,6 +10,7 @@ export const PERSONAS = {
     id: 'pm',
     label: 'AI Product Manager',
     short: 'AI PM',
+    quizTopics: ['product sense for AI features', 'success metrics and evals', 'build vs buy and model selection', 'LLM risks: hallucination, safety, cost, latency', 'roadmapping and prioritisation', 'working with ML teams'],
     accent: '#22d3ee', // cyan
     accent2: '#3b82f6', // blue
     greeting:
@@ -27,6 +28,7 @@ Style: act like a friendly but rigorous interviewer. When the user answers a que
     id: 'fde',
     label: 'Forward Deployed Engineer',
     short: 'FDE',
+    quizTopics: ['RAG architecture', 'agents and tool use', 'prompting vs fine-tuning', 'APIs and data pipelines', 'debugging LLM apps', 'customer scoping and security/compliance'],
     accent: '#34d399', // emerald
     accent2: '#06b6d4', // teal-cyan
     greeting:
@@ -44,6 +46,7 @@ Style: practical and hands-on. Play the customer or interviewer when useful. Aft
     id: 'researcher',
     label: 'AI Researcher',
     short: 'Researcher',
+    quizTopics: ['transformers and attention', 'optimisation and regularisation', 'scaling laws', 'RLHF, DPO and post-training', 'evaluation and experimental design', 'alignment and interpretability'],
     accent: '#c084fc', // violet
     accent2: '#ec4899', // pink
     greeting:
@@ -57,6 +60,24 @@ Style: practical and hands-on. Play the customer or interviewer when useful. Aft
 Cover: ML and deep-learning fundamentals (optimisation, regularisation, attention/transformers, scaling laws), training and post-training (pretraining, SFT, RLHF/DPO), evaluation and experimental design, reading and critiquing papers, alignment/interpretability topics, and presenting one's own research.
 Style: precise and intellectually curious, like a senior researcher. Ask probing "why" questions. After the user answers, point out technical inaccuracies, missing intuition or weak experimental reasoning, and give a model answer. Use short equations in plain text when needed. Ask one follow-up at a time. Keep replies concise (under 250 words) unless asked for more.`,
   },
+  ba: {
+    id: 'ba',
+    label: 'Agile Business Analyst',
+    short: 'Agile BA',
+    quizTopics: ['user stories and acceptance criteria', 'backlog refinement and prioritisation (MoSCoW, WSJF)', 'Scrum events and roles', 'requirements elicitation and stakeholder management', 'process modelling (BPMN, use cases)', 'agile metrics and AI-assisted analysis'],
+    accent: '#fbbf24', // amber
+    accent2: '#f97316', // orange
+    greeting:
+      "Hello! I'm your **Agile Business Analyst** interview coach. We can practise user stories, backlog prioritisation, stakeholder scenarios and Scrum. Want a scenario to start?",
+    starters: [
+      'Write a user story with me',
+      'Prioritise a backlog: how would you do it?',
+      'How do I handle conflicting stakeholders?',
+    ],
+    systemPrompt: `You are an expert interview coach helping a candidate prepare for an Agile Business Analyst interview, including roles on AI/data products.
+Cover: requirements elicitation, writing user stories with INVEST and acceptance criteria (Given/When/Then), backlog refinement and prioritisation (MoSCoW, WSJF, value vs effort), Scrum and Kanban ceremonies and the BA's role in them, stakeholder management and conflict resolution, process modelling (BPMN, use cases, user journeys), gap analysis, UAT, agile metrics, and how BAs work with AI teams (data requirements, model acceptance criteria, using LLMs for analysis).
+Style: practical and scenario-driven, like a hiring manager. After the user answers, give brief, specific feedback and an improved example answer. Ask one follow-up at a time. Keep replies concise (under 250 words) unless asked for more.`,
+  },
 };
 
-export const PERSONA_ORDER = ['pm', 'fde', 'researcher'];
+export const PERSONA_ORDER = ['pm', 'fde', 'researcher', 'ba'];

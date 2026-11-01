@@ -1,26 +1,27 @@
 /* ---------- Animatable colour variables ----------
-   Normally CSS can't smoothly animate a custom property. Registering them
-   with @property tells the browser they are colours, so `transition` works.
-   That is what makes the chatbot colours fade when you change job. */
+   Registering them with @property tells the browser they are colours,
+   so `transition` can fade them when you change role. */
 @property --accent  { syntax: '<color>'; inherits: true; initial-value: #22d3ee; }
 @property --accent2 { syntax: '<color>'; inherits: true; initial-value: #3b82f6; }
 
 :root {
-  --accent: #22d3ee;   /* set from JavaScript per job */
+  --accent: #22d3ee;   /* set from JavaScript per role */
   --accent2: #3b82f6;
   --text: #e8f0ff;
   --muted: #9db0d6;
+  --good: #34d399;
+  --bad: #fb7185;
   transition: --accent 0.6s ease, --accent2 0.6s ease;
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
-  min-height: 100vh;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
-  /* Layer 1-2: the grid lines. Layer 3-4: neon glow blobs. Layer 5: deep blue base. */
+  /* grid lines + neon glows + deep blue base */
   background:
     linear-gradient(rgba(80, 140, 255, 0.12) 1px, transparent 1px) 0 0 / 44px 44px,
     linear-gradient(90deg, rgba(80, 140, 255, 0.12) 1px, transparent 1px) 0 0 / 44px 44px,
@@ -30,14 +31,17 @@ body {
   background-attachment: fixed;
 }
 
+/* The app fills exactly one screen. Only the chat/quiz area scrolls,
+   so the title, roles and input box are always visible. */
 .app {
-  max-width: 860px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 16px;
+  padding: 14px 16px;
   height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 /* ---------- Header ---------- */
@@ -45,13 +49,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-bottom: 8px;
   border-bottom: 2px solid var(--accent);
-  padding-bottom: 10px;
   box-shadow: 0 8px 20px -14px var(--accent);
 }
 .header h1 {
   margin: 0;
-  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-size: clamp(1.2rem, 3.5vw, 1.7rem);
   letter-spacing: 0.04em;
   background: linear-gradient(90deg, var(--accent), var(--accent2));
   -webkit-background-clip: text;
@@ -62,24 +66,35 @@ body {
   background: none;
   border: none;
   color: var(--muted);
+  font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
   text-decoration: underline;
 }
 .link-btn:hover { color: var(--text); }
 
-/* ---------- Job bubbles ---------- */
+/* ---------- Layout: sidebar + panel ---------- */
+.layout {
+  flex: 1;
+  min-height: 0;           /* lets children scroll instead of growing the page */
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  gap: 14px;
+}
+
+/* ---------- Role list ---------- */
 .jobs {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
 }
 .job {
   --job-accent: var(--accent);
-  padding: 10px 20px;
-  border-radius: 999px;            /* fully round, like the circles in the sketch */
-  border: 2px solid var(--job-accent);
+  text-align: left;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 2px solid color-mix(in srgb, var(--job-accent) 70%, transparent);
   background: rgba(5, 15, 50, 0.55);
   color: var(--text);
   font: inherit;
@@ -87,43 +102,82 @@ body {
   cursor: pointer;
   transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
 }
-.job:hover { transform: translateY(-2px); }
+.job:hover { transform: translateX(3px); border-color: var(--job-accent); }
 .job.active {
   background: var(--job-accent);
+  border-color: var(--job-accent);
   color: #04102e;
-  box-shadow: 0 0 18px var(--job-accent);
+  box-shadow: 0 0 18px -2px var(--job-accent);
 }
 
-/* ---------- Chat panel ---------- */
-.chat {
+/* ---------- Panel (chat + quiz) ---------- */
+.panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  border: 1px solid var(--accent);
+  background: rgba(4, 12, 40, 0.68);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 30px -8px var(--accent), inset 0 0 40px -30px var(--accent2);
+  overflow: hidden;
+}
+.panel-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.role-title { font-weight: 700; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mode-tabs {
+  display: flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+}
+.mode {
+  padding: 6px 18px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mode.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #04102e;
+}
+
+.view {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  border-radius: 18px;
-  border: 1px solid var(--accent);
-  background: rgba(4, 12, 40, 0.62);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 30px -8px var(--accent), inset 0 0 40px -30px var(--accent2);
+  padding: 14px 16px 16px;
 }
+
+/* ---------- Chat ---------- */
+.messages-wrap { position: relative; flex: 1; min-height: 0; }
 .messages {
-  flex: 1;
+  height: 100%;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-right: 4px;
+  padding-right: 6px;
+  scroll-behavior: smooth;
 }
-
 .msg {
-  max-width: 80%;
+  max-width: 85%;
   padding: 10px 14px;
   border-radius: 14px;
-  line-height: 1.5;
+  line-height: 1.55;
   overflow-wrap: anywhere;
 }
-/* Bot on the LEFT, user on the RIGHT - as in the sketch */
+/* Bot on the LEFT, user on the RIGHT */
 .msg.bot {
   align-self: flex-start;
   background: rgba(255, 255, 255, 0.07);
@@ -137,16 +191,26 @@ body {
   font-weight: 500;
   border-top-right-radius: 4px;
 }
-.msg code {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1px 5px;
-  border-radius: 4px;
-}
+.msg code { background: rgba(0, 0, 0, 0.3); padding: 1px 5px; border-radius: 4px; }
 .msg.typing { opacity: 0.7; font-style: italic; }
-.msg.error-msg { border-color: #ff6b81; color: #ffb3c0; }
+.msg.error-msg { border-color: var(--bad); color: #ffb3c0; }
 
-/* ---------- Suggestion chips ---------- */
-.starters { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+.jump {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: #07123a;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 0 14px -2px var(--accent);
+}
+
+.starters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .starters:empty { display: none; }
 .chip {
   padding: 6px 12px;
@@ -160,10 +224,8 @@ body {
 }
 .chip:hover { background: color-mix(in srgb, var(--accent) 25%, transparent); }
 
-/* ---------- Composer ---------- */
 .composer { display: flex; gap: 10px; margin-top: 12px; }
-input {
-  flex: 1;
+input, select {
   padding: 12px 14px;
   border-radius: 10px;
   border: 1px solid var(--accent);
@@ -172,9 +234,12 @@ input {
   font: inherit;
   outline: none;
 }
-input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
-button[type='submit'] {
+.composer input { flex: 1; min-width: 0; }
+input:focus, select:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+
+button[type='submit'], .primary {
   padding: 0 22px;
+  min-height: 44px;
   border: none;
   border-radius: 10px;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -184,6 +249,98 @@ button[type='submit'] {
   cursor: pointer;
 }
 button[type='submit']:disabled { opacity: 0.5; cursor: wait; }
+.secondary {
+  padding: 0 22px;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ---------- Quiz ---------- */
+.quiz { overflow-y: auto; }
+.quiz-card { width: min(720px, 100%); margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.quiz-card.center { align-items: center; text-align: center; padding: 40px 0; }
+.quiz-card h2 { margin: 0; }
+.quiz-card h3 { margin: 6px 0 0; }
+.quiz-card p { margin: 0; color: var(--muted); line-height: 1.5; max-width: 52ch; }
+.field { display: flex; flex-direction: column; gap: 6px; text-align: left; color: var(--muted); font-size: 0.9rem; }
+.quiz-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.9rem; }
+.progress { height: 6px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s; }
+.question { font-size: 1.2rem; line-height: 1.4; }
+
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.45;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.option:not(:disabled):hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+.option:disabled { cursor: default; }
+.option .letter {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.option.correct { border-color: var(--good); background: color-mix(in srgb, var(--good) 22%, transparent); }
+.option.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 22%, transparent); }
+
+.explain { padding: 12px 14px; border-radius: 12px; line-height: 1.5; border-left: 4px solid; background: rgba(255, 255, 255, 0.05); }
+.explain.good { border-color: var(--good); }
+.explain.bad { border-color: var(--bad); }
+
+.score-ring {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 10px;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  font-size: 2.4rem;
+  font-weight: 800;
+  border-radius: 50%;
+  border: 6px solid var(--accent);
+  box-shadow: 0 0 24px -4px var(--accent);
+}
+.score-ring small { font-size: 0.9rem; font-weight: 500; color: var(--muted); }
+.review { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 12px; }
+.review li { padding-left: 6px; line-height: 1.5; font-size: 0.95rem; }
+.review li::marker { font-weight: 700; }
+.review li.good strong { color: var(--good); }
+.review li.bad strong { color: var(--bad); }
+.review em { color: var(--muted); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ---------- API key modal ---------- */
 .modal {
@@ -196,7 +353,6 @@ button[type='submit']:disabled { opacity: 0.5; cursor: wait; }
   backdrop-filter: blur(6px);
   z-index: 10;
 }
-.modal[hidden] { display: none; }
 .modal-card {
   width: min(440px, 100%);
   display: flex;
@@ -213,8 +369,19 @@ button[type='submit']:disabled { opacity: 0.5; cursor: wait; }
 .modal-card a { color: var(--accent); }
 .modal-card button[type='submit'] { padding: 12px; }
 .error { color: #ff8da1 !important; }
-[hidden] { display: none !important; }
 
-@media (max-width: 520px) {
-  .msg { max-width: 92%; }
+/* ---------- Phones / narrow screens ---------- */
+@media (max-width: 760px) {
+  .app { padding: 10px; gap: 8px; }
+  .layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 8px; }
+  /* Roles become one horizontally scrolling row */
+  .jobs { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
+  .job { flex: none; white-space: nowrap; padding: 9px 14px; }
+  .job:hover { transform: none; }
+  .msg { max-width: 94%; }
+  .panel-top { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+  .role-title { display: none; }
+  .mode-tabs { flex: 1; }
+  .mode { flex: 1; }
+  .view { padding: 10px 12px 12px; }
 }
