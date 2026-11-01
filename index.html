@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Interview Agent</title>
+  </head>
+  <body data-persona="pm">
+    <div class="app">
+      <!-- Title bar (top of the sketch) -->
+      <header class="header">
+        <h1>AI Interview Agent</h1>
+        <button id="change-key" class="link-btn" type="button" hidden>Change API key</button>
+      </header>
+
+      <!-- The three job "bubbles" (Job1 / Job2 / Job3 in the sketch) -->
+      <nav id="jobs" class="jobs" aria-label="Choose the job you are interviewing for"></nav>
+
+      <!-- Chat panel: bot messages on the left, user messages on the right -->
+      <main class="chat">
+        <div id="messages" class="messages" aria-live="polite"></div>
+        <div id="starters" class="starters"></div>
+        <form id="chat-form" class="composer" autocomplete="off">
+          <input id="chat-input" type="text" placeholder="Type your answer or a question..." required />
+          <button id="send-btn" type="submit">Send</button>
+        </form>
+      </main>
+    </div>
+
+    <!-- API key screen: shown until the user enters a key -->
+    <div id="key-modal" class="modal" hidden>
+      <form id="key-form" class="modal-card">
+        <h2>Enter your Gemini API key</h2>
+        <p>
+          Your key is needed to talk to Gemini. It is kept only in this browser tab
+          (session storage) and sent only to Google.
+          Get one free at
+          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>.
+        </p>
+        <input id="key-input" type="password" placeholder="Paste your API key" required autocomplete="off" />
+        <p id="key-error" class="error" hidden></p>
+        <button type="submit">Start preparing</button>
+      </form>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
